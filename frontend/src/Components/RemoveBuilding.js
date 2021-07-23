@@ -19,7 +19,7 @@ const handleClick=(e,id)=>{
     //e.preventDefault()
     console.log('remove building clicked',id)
     let requestOptions = {
-        method: 'POST',
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             building_id: id,

@@ -2,6 +2,17 @@ var express = require('express');
 var router = express.Router();
 const db = require('../db')
 
+const minusYear=(time)=>{
+  //1595534634000
+  //1879531434000
+  //1 year = 31556926
+  db('assets')
+  .select('id')
+  .where('last_inv_date')
+
+  return (time - 31556926)
+}
+
 
 router.get('/', function(req, res, next) {
   console.log('/ hit')
@@ -9,29 +20,31 @@ router.get('/', function(req, res, next) {
   res.end()
 });
 
-// TODO
+
 router.get('/allrecords', (req,res)=>{
-  db.select('*')
-    .from('assets')
-    .orderBy('id')
-    .then( data => res.json(data).status(200))
-
-
-  // db.from('assets_b_locations')
-  //   .leftJoin('assets', 'assets_b_locations.assets_id', 'assets.id' )
-  //   .leftJoin('b_locations', 'assets_b_locations.locations_id', 'b_locations.id')
-  //   .select('assets.name','assets.inges_date', 'assets.serial', 'assets.last_inv_date', 'assets.active', 'b_locations.name')
-  //   .orderBy('assets.id')
-  //   .then(data => res.status(200).json(data.rows))
-  //   .catch(err =>
-  //     res.status(500).json({
-  //       message: err
-  //     })
-  //   );
+  db.select(
+    'assets.id',
+    'assets.name as asset_name',
+    'assets.serial',
+    'assets.last_inv_date',
+    'assets.inges_date',
+    'assets.active',
+    'b_locations.name as location_name'
+    )
+    .from('assets_b_locations')
+    .leftJoin('assets','assets_b_locations.assets_id','assets.id')
+    .leftJoin('b_locations','assets_b_locations.locations_id','b_locations.id')
+    .orderBy('assets.id')
+    .then(data => res.status(200).json(data))
+    .catch(err =>
+      res.status(500).json({
+        message: err
+      })
+    );
 
 })
 
-// FINISHED
+
 router.get('/allbuildinglocations', (req,res)=>{
   db.select('*')
   .from('b_locations')
@@ -45,12 +58,32 @@ router.get('/allbuildinglocations', (req,res)=>{
 
 
 router.get('/needsinventory', (req,res)=>{
-  db.select('*')
-  .from('assets')
-  .then( data => res.json(data.rows).status(200))
+
+  let now = new Date().getTime()
+
+  db.select(
+    'assets.id',
+    'assets.name as asset_name',
+    'assets.serial',
+    'assets.last_inv_date',
+    'assets.inges_date',
+    'assets.active',
+    'b_locations.name as location_name'
+    )
+    .where('assets.last_inv_date','<', now - 31556926 ) //1627060675350
+    .from('assets_b_locations')
+    .leftJoin('assets','assets_b_locations.assets_id','assets.id')
+    .leftJoin('b_locations','assets_b_locations.locations_id','b_locations.id')
+    .orderBy('assets.id')
+    .then(data => res.status(200).json(data))
+    .catch(err =>
+      res.status(500).json({
+        message: err
+      })
+    );
 })
 
-// FINISHED
+
 router.post('/addbuilding', (req,res)=>{
   console.log('add building hit', req.body)
 
@@ -67,12 +100,14 @@ router.post('/addbuilding', (req,res)=>{
 router.get('/join', (req,res)=>{
   db('assets_b_locations')
   .select('*')
-  .then( data => res.json(data.rows).status(200))
+  .then( data => res.json(data).status(200))
 })
 
 
-// FINISHED
-router.post('/removebuilding', (req,res)=>{
+router.delete('/removebuilding', (req,res)=>{
+  if( req.body.building_id === 1){
+    res.status(500).send('unable to delete "no location"')
+  }
   db('b_locations')
     .where('id',`${req.body.building_id}`)
     .del()
@@ -84,7 +119,7 @@ router.post('/removebuilding', (req,res)=>{
     )
 })
 
-// TODO
+
 router.post('/addrecord', (req,res)=>{
   console.log(req.body)
 
@@ -99,41 +134,55 @@ router.post('/addrecord', (req,res)=>{
       active  : 'true'
     })
     .returning('id')
-    .then( res => console.log(res))
-    /*
-    .then( data => {
-      let asset_id = data
+    .then( returnedId => {
+      let asset_id = returnedId[0]
+      
       db('b_locations')
       .select('id')
       .where('name',`${req.body.building_location}`)
-      .then( buildingId => {
-        db('assets_b_locations')
-        .insert({
-          assets_id: asset_id,
-          locations_id: building_id
-        })
-      })
+      .then( res => {
+          let buildingId = res[0].id
+          console.log('inside /addrecord, inserting into join table')
+          db('assets_b_locations')
+            .insert({
+              assets_id: asset_id,
+              locations_id: buildingId
+            })
+            .then(res => console.log('res',res))
+          })
+      .then( data => res.json(data).status(200))
     })
-
-       .then( data => {
-           let assetId = data.rows[0].id
-           db.query(`SELECT id FROM b_locations WHERE name = '${req.body.building_location}';`)
-           .then( data2 => {
-              let buildingId = data2.rows[0].id
-              db.query(`INSERT INTO assets_b_locations ( assets_id, locations_id ) VALUES ( ${assetId},${buildingId});`)
-           })
-       })*/
 })
 
 
-// TODO
-router.post('/updaterecord', (req,res)=>{
+router.delete('/deleterecord', (req,res)=>{
+  let asset_id = req.body.id
+  db('assets_b_locations')
+  .where('assets_id',`${asset_id}`)
+  .del()
+  .then( data => res.json(data).status(200))
+})
+
+router.delete('/deleteall', (req,res)=>{
+  db('assets_b_locations')
+  .where('assets_id','<', 1000)
+  .del()
+  .then( data => res.json(data).status(200))
+})
+
+
+router.put('/updaterecord', (req,res)=>{
   console.log(req.body)
+  let asset_id = req.body.id
   let column = ''
+  let isLocationUpdate = false
   if(req.body.name){
       column = 'name'
       newValue = req.body.name
-  } else if(req.body.serial){
+  }else if(req.body.location_name){
+    console.log('new location')
+    isLocationUpdate = true
+  }else if(req.body.serial){
       column ='serial'
       newValue = req.body.serial
   }else if(req.body.last_inv_date){
@@ -148,13 +197,30 @@ router.post('/updaterecord', (req,res)=>{
       .update({
         active : `${req.body.active}`
       })
-      .then( res.status(200).end())
+      .then( res.status(200))
   } 
   
-  db('assets')
-  .where('id',`${req.body.id}`)
-  .update( `${column}`, `${newValue}`)
-  .then( res.status(200).end())
+  if( isLocationUpdate === false ){
+    db('assets')
+    .where('id',`${req.body.id}`)
+    .update( `${column}`, `${newValue}`)
+    .then( res.status(200) )
+  } else {
+    db('b_locations')
+      .select('id')
+      .where('name',`${req.body.location_name}`)
+      .returning('id')
+      .then( res => {
+        console.log(`NEW LOCATION POSTED ${res[0].id}`)
+        let location_id = res[0].id
+        db('assets_b_locations')
+          .where('assets_id',`${asset_id}`)
+          .update('locations_id',`${location_id}`)
+          .returning('id')
+          .then( res => console.log(res))
+      }).then( data => res.json(data).status(200))
+    res.status(200)
+  }
 
 })
 module.exports = router;

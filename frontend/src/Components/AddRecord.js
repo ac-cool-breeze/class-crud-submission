@@ -9,6 +9,7 @@ import {
     Button,
     makeStyles,
     Container,
+    Typography
  } from "@material-ui/core"
 
 import ManageBuildings from "./ManageBuildings"
@@ -46,6 +47,7 @@ const AddRecord=()=>{
     const clickHandlerSetName = (event) =>{
         setName(event.target.value)
     }
+
 
     const clickHandlerSetSerial = (event) =>{
         setSerial(event.target.value)
@@ -91,7 +93,7 @@ const AddRecord=()=>{
     return (
         <>
             <Container className={classes.root}>
-                <h2>Add an asset.</h2>
+                <Typography variant="h2">Add an asset.</Typography>
                 <Paper elevation={2} className={classes.child} align="center">
                 <form id="addRecordForm" className={classes.form} onSubmit={handleSubmit}>
                     <InputLabel id="assetNameLabel" className={classes.form}>Asset Name</InputLabel >

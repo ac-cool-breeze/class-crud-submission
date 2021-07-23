@@ -5,13 +5,14 @@ import {
     Button,
     TextField,
     Switch,
-    InputLabel
+    InputLabel,
 } from '@material-ui/core';
 
 import { makeStyles } from '@material-ui/core';
 import { useState } from 'react';
 import { KeyboardDatePicker, MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers'
 import DateFnsUtils from '@date-io/date-fns'
+import AllBuildings from './AllBuildings';
 
 const useStyles = makeStyles((theme) => ({
     center:{
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }))
 
-const UpdateRecord =({ props, setOpen })=>{
+const UpdateRecord =({ props, setOpen, getAllRecords })=>{
     const handleDateChange = (date) => {
         let newTime = new Date(date)
         let parsed = newTime.getTime()
@@ -49,7 +50,7 @@ const UpdateRecord =({ props, setOpen })=>{
 
     const clickHandler=(e)=>{
         let requestOptions = {
-            method: 'POST',
+            method: 'PUT',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -58,15 +59,35 @@ const UpdateRecord =({ props, setOpen })=>{
                 serial: newSerial,
                 last_inv_date: newLastInvDate,
                 inges_date: newIngesDate,
-                active: newActive
+                active: newActive,
+                location_name: buildingLocation
             })
         }
         fetch('https://class-wind-backend.herokuapp.com/updaterecord', requestOptions)
+        getAllRecords()
         setOpen(false)
     }
 
     const handleSubmit=(e)=>{
         e.preventDefault()
+    }
+
+    const yesDeleteHandler=(e)=>{
+        let requestOptions = {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: props.id
+            })
+        }
+        fetch('https://class-wind-backend.herokuapp.com/deleterecord', requestOptions)
+        getAllRecords()
+        setOpen(false)
+    }
+
+    const noDeleteHandler=(e)=>{
+        setOpen(false)
     }
 
     const handleNameChange=(e)=>{
@@ -75,6 +96,10 @@ const UpdateRecord =({ props, setOpen })=>{
             console.log('char code pressed')
             clickHandler()
         }
+    }
+
+    const handleLocationChange=(e)=>{
+        SetBuildingLocation(e.currentTarget.value)
     }
 
     const handleSerialChange=(e)=>{
@@ -91,12 +116,12 @@ const UpdateRecord =({ props, setOpen })=>{
     const [ newLastInvDate, setNewLastInvDate ] = useState('')
     const [ newIngesDate, setNewIngesDate ] = useState('')
     const [ newActive, setNewActive ] = useState('')
+    const [ buildingLocation, SetBuildingLocation ] = useState('')
     const [ activeValue, setActiveValue ] = useState( props.value === 'false' ? false: true)
     const [selectedDate, setSelectedDate] = useState('');
     const [unformattedSelectedDate, setUnformattedSelectedDate] = useState('')
     const classes = useStyles();
 
-    let isChecked = activeValue
     let field = props.field
 
 
@@ -108,6 +133,7 @@ const UpdateRecord =({ props, setOpen })=>{
         <DialogContent dividers className={classes.center} align="center">
             <form onSubmit={handleSubmit}>
                 { field === 'name' ? <><InputLabel>Name:</InputLabel><TextField label="New Name" onChange={handleNameChange} onKeyPress={handleNameChange} /></> : <></> }
+                { field === 'location_name' ? <><AllBuildings handleLocationChange={handleLocationChange} SetBuildingLocation={SetBuildingLocation}/></> : <></> }
                 { field === 'serial' ? <><InputLabel>Serial:</InputLabel><TextField label="New Serial" onChange={handleSerialChange} /></> : <></> }
                 { field === 'last_inv_date' ? <><InputLabel>Inventory Date:</InputLabel><MuiPickersUtilsProvider utils={DateFnsUtils}><KeyboardDatePicker
                     margin="normal"
@@ -146,7 +172,7 @@ const UpdateRecord =({ props, setOpen })=>{
                 </MuiPickersUtilsProvider></> : <></> }
                 { field === 'active' ? <><InputLabel className={classes.center}>Active:</InputLabel><Switch checked={activeValue} onChange={handleActiveChange} label="Active"/></> : <></> }
             <br/>
-            <Button type="submit" onClick={clickHandler} color="secondary" variant="contained" className={classes.margin}>Update Record</Button>
+            { field === 'delete' ? <><InputLabel className={classes.center}>"Delete Record(Are you sure?)"</InputLabel><Button onClick={yesDeleteHandler} variant="contained" color="primary">Yes, Delete.</Button><Button onClick={noDeleteHandler} variant="contained" color="secondary">No, DO NOT DELETE.</Button></> : <Button type="submit" onClick={clickHandler} color="secondary" variant="contained" className={classes.margin}>Update Record</Button> }
             </form>
         </DialogContent>
         </>

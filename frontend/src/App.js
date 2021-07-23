@@ -129,16 +129,16 @@ export default function App() {
       <Toolbar className={classes.drawerToolBar} />
       <div className={classes.drawerContainer}>
           <List>
-            <Link component={RouterLink} to="/allrecords" className={classes.link} >
-              <ListItem button key='AllRecords' id="allrecordslink"><ListItemText primary="All Records"/></ListItem>
+            <Link component={RouterLink} to="/needsinventory" className={classes.link}>
+              <ListItem button key='NeedsInventory'><ListItemText primary="Needs Inventory"/></ListItem>
             </Link>
             <Divider className={classes.divider}/>
             <Link component={RouterLink} to="/addrecord" className={classes.link}>
               <ListItem button key='AddRecord'><ListItemText primary="Add a record"/></ListItem>
             </Link>
             <Divider className={classes.divider}/>
-            <Link component={RouterLink} to="/needsinventory" className={classes.link}>
-              <ListItem button key='NeedsInventory'><ListItemText primary="Needs Inventory"/></ListItem>
+            <Link component={RouterLink} to="/allrecords" className={classes.link} >
+              <ListItem button key='AllRecords' id="allrecordslink"><ListItemText primary="All Records"/></ListItem>
             </Link>
             <Divider className={classes.divider}/>
           </List>

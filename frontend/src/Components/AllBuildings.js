@@ -5,16 +5,19 @@ const AllBuildings=({ SetBuildingLocation, buildingLocation  })=>{
 
     const [ buildings, setBuildings] = useState([])
 
+    const getBuildings=async (e)=>{
+        let response = await fetch('https://class-wind-backend.herokuapp.com/allbuildinglocations')
+        let data = await response.json()
+        setBuildings(data)
+    }
+
     useEffect(()=>{
-        fetch('https://class-wind-backend.herokuapp.com/allbuildinglocations')
-        .then( res => console.log(res))
-        .then( res => res.json())
-        .then( json=> setBuildings(json))
+        getBuildings()
     },[])
 
     const handleChange = (event) => {
         SetBuildingLocation(event.target.value);
-      };
+    };
 
     return (
             <>
@@ -22,11 +25,11 @@ const AllBuildings=({ SetBuildingLocation, buildingLocation  })=>{
             <Select
             labelId="buildingLocationSelection"
             id="buildingLocationSelection"
-            value={buildingLocation}
+            //value={buildingLocation}
             onChange={handleChange}
             >
             {buildings.map(ele=>{
-                return <MenuItem>{ele.name}</MenuItem>
+                return <MenuItem value={ele.name}>{ele.name}</MenuItem>
             })}
             </Select>
             </>

@@ -8,9 +8,7 @@ import {
     makeStyles,
     Container,
     Dialog,
-    DialogTitle,
     Typography,
-    DialogContent
 } from '@material-ui/core';
 
 import { useState, useEffect } from 'react';
@@ -53,33 +51,41 @@ const AllRecords=()=>{
         let recordValue = e.target.innerHTML
         setProps({ id: recordId, field: recordField, value: recordValue })
         setOpen(true);
+        getAllRecords()
     }
 
     const handleClose=(value)=>{
+        getAllRecords()
         setOpen(false);
         setSelectedValue(value)
     }
+    
+    const getAllRecords = async ()=>{
+        let response = await fetch( 'https://class-wind-backend.herokuapp.com/allrecords')
+        let data = await response.json()
+        setRecords([...data])
+    }
 
     useEffect(()=>{
-        fetch( 'https://class-wind-backend.herokuapp.com/allrecords')
-        .then( res => res.json() )
-        .then( json => setRecords([...json]))
-    })
+        getAllRecords()
+    },[records])
 
     return(
         <>
         <Container className={classes.root}>
 
-        <h2>All Records</h2>
+        <Typography variant="h2">All Records</Typography>
         <Paper align="center">
         <TableContainer  className={classes.table}>
             <TableHead>
                 <TableRow>
                     <TableCell>Asset Name</TableCell>
-                    <TableCell>Added to inventory</TableCell>
                     <TableCell>Serial</TableCell>
+                    <TableCell>Location</TableCell>
+                    <TableCell>Added to inventory</TableCell>
                     <TableCell>Last Inventory Date</TableCell>
                     <TableCell>Active</TableCell>
+                    <TableCell>Delete</TableCell>
                 </TableRow>
             </TableHead>
             <TableBody>
@@ -87,11 +93,13 @@ const AllRecords=()=>{
                 records.map(ele => {
                     return(
                         <TableRow key={'tablerow'+ele.id+'head'} id={ele.id}>
-                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'name'} onClick={handleClickOpen} id={ele.id} data-value="name">{ele.name}</TableCell>
-                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'inges_date'} onClick={handleClickOpen} id={ele.id} data-value="inges_date">{ msToLocale(ele.inges_date) }</TableCell>
+                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'name'} onClick={handleClickOpen} id={ele.id} data-value="name">{ele.asset_name}</TableCell>
                             <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'serial'} onClick={handleClickOpen} id={ele.id} data-value="serial">{ele.serial}</TableCell>
+                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'location_name'} onClick={handleClickOpen} id={ele.id} data-value="location_name">{ele.location_name}</TableCell>
+                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'inges_date'} onClick={handleClickOpen} id={ele.id} data-value="inges_date">{ msToLocale(ele.inges_date) }</TableCell>
                             <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'last_inv_date'} onClick={handleClickOpen} id={ele.id} data-value="last_inv_date">{ msToLocale(ele.last_inv_date) }</TableCell>
                             <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'active'} onClick={handleClickOpen} id={ele.id} data-value="active">{ele.active.toString()}</TableCell>
+                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'delete'} onClick={handleClickOpen} id={ele.id} data-value="delete">❌</TableCell>
                         </TableRow>
                     )
                 })
@@ -99,7 +107,7 @@ const AllRecords=()=>{
             </TableBody>
         </TableContainer>
         <Dialog onClose={handleClose} aria-labelledby="customized-dialog-title" open={open}>
-            <UpdateRecord props={props} setOpen={setOpen}/>
+            <UpdateRecord props={props} setOpen={setOpen} getAllRecords={getAllRecords}/>
         </Dialog>
         </Paper>
 

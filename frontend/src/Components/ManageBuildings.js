@@ -1,5 +1,5 @@
 import { useState} from "react"
-import { Paper, InputLabel, TextField, makeStyles, Button } from "@material-ui/core"
+import { Paper, InputLabel, TextField, makeStyles, Button, Typography } from "@material-ui/core"
 import RemoveBuildings from "./RemoveBuilding";
 
 
@@ -44,7 +44,7 @@ const ManageBuildings=()=>{
 
     return (
         <>
-        <h2>Manage Building Locations</h2>
+        <Typography variant="h2">Manage Building Locations</Typography>
         
         <RemoveBuildings/>
 
