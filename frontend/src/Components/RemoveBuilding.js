@@ -25,7 +25,7 @@ const handleClick=(e,id)=>{
             building_id: id,
         })
     }
-    fetch('http://localhost:3001/removebuilding', requestOptions)
+    fetch('https://class-wind-backend.herokuapp.com/removebuilding', requestOptions)
 }
 
 
@@ -34,7 +34,7 @@ const RemoveBuildings=()=>{
     const [buildings, setBuildings] = useState([])
 
     useEffect(()=>{
-        fetch('http://localhost:3001/allbuildinglocations')
+        fetch('https://class-wind-backend.herokuapp.com/allbuildinglocations')
             .then( res => res.json())
             .then( json => {
                 setBuildings(json.map( ele=>{
@@ -42,6 +42,7 @@ const RemoveBuildings=()=>{
                 }))
             })
     })
+
 
     return (
         <>

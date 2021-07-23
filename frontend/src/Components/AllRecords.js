@@ -36,11 +36,10 @@ const AllRecords=()=>{
     
 
     const classes = useStyles()
-    const convertTime=(unixTimeStamp)=>{
-        let dateObj = new Date(unixTimeStamp * 1000)
-        let utcString = dateObj.toUTCString()
-        //let time = utcString.slice(-11,-4)
-        return utcString
+    const msToLocale=(msTimestamp)=>{
+        let parsed = new Date(parseInt(msTimestamp))
+        let formmatedTime = parsed.toLocaleString()
+        return formmatedTime
     }
 
     const [ records, setRecords ] = useState([])
@@ -52,7 +51,6 @@ const AllRecords=()=>{
         let recordId = e.target.id
         let recordField = e.currentTarget.dataset.value
         let recordValue = e.target.innerHTML
-        console.log(recordValue)
         setProps({ id: recordId, field: recordField, value: recordValue })
         setOpen(true);
     }
@@ -63,7 +61,7 @@ const AllRecords=()=>{
     }
 
     useEffect(()=>{
-        fetch( 'http://localhost:3001/allrecords')
+        fetch( 'https://class-wind-backend.herokuapp.com/allrecords')
         .then( res => res.json() )
         .then( json => setRecords([...json]))
     })
@@ -90,10 +88,10 @@ const AllRecords=()=>{
                     return(
                         <TableRow key={'tablerow'+ele.id+'head'} id={ele.id}>
                             <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'name'} onClick={handleClickOpen} id={ele.id} data-value="name">{ele.name}</TableCell>
-                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'inges_date'} onClick={handleClickOpen} id={ele.id} data-value="inges_date">{convertTime(ele.inges_date)}</TableCell>
+                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'inges_date'} onClick={handleClickOpen} id={ele.id} data-value="inges_date">{ msToLocale(ele.inges_date) }</TableCell>
                             <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'serial'} onClick={handleClickOpen} id={ele.id} data-value="serial">{ele.serial}</TableCell>
-                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'last_inv_date'} onClick={handleClickOpen} id={ele.id} data-value="last_inv_date">{convertTime(ele.last_inv_date)}</TableCell>
-                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'active'} onClick={handleClickOpen} id={ele.id} data-value="active">{ele.active}</TableCell>
+                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'last_inv_date'} onClick={handleClickOpen} id={ele.id} data-value="last_inv_date">{ msToLocale(ele.last_inv_date) }</TableCell>
+                            <TableCell className={classes.tableRow} key={'tablerow'+ele.id+'active'} onClick={handleClickOpen} id={ele.id} data-value="active">{ele.active.toString()}</TableCell>
                         </TableRow>
                     )
                 })

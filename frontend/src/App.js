@@ -28,7 +28,7 @@ import ManageBuildings from './Components/ManageBuildings';
 /*
     Style:
     #0F0C24     #202020
-    #A350A3     #b4deff   #ffc23e
+    #A350A3     #d6fdff   #ffc23e
     #C1436D     #18f3ff
 */
 const drawerWidth = 175;
@@ -42,17 +42,16 @@ const useStyles = makeStyles((theme)=>({
     display: 'flex'
   },
   pretty: {
-    background: 'linear-gradient(45deg, #b4deff 30%, #18f3ff 90%)',
+    background: 'linear-gradient(45deg, #d6fdff 30%, #d6fdff 90%)',
     boxShadow: '0 1px 1px 1px rgba(255, 105, 135, .3)'
   },
   aPaper: {
     backgroundColor: '#202020',
-    color: '#18f3ff',
+    color: '#d6fdff',
     padding: '20px'
   },
   appBar: {
-    backgroundColor: '#18f3ff',
-    borderBottom: '1px solid #202020',
+    backgroundColor: '#d6fdff',
     color: '#202020',
     zIndex: theme.zIndex.drawer + 1,
   },
@@ -63,7 +62,7 @@ const useStyles = makeStyles((theme)=>({
   drawerPaper: {
     width: drawerWidth,
     backgroundColor: '#202020',
-    color: '#18f3ff'
+    color: '#d6fdff'
   },
   drawerContainer: {
     overflow: 'auto',
@@ -73,10 +72,10 @@ const useStyles = makeStyles((theme)=>({
     padding: theme.spacing(3),
   },
   divider:{
-    backgroundColor: '#18f3ff',
+    backgroundColor: '#d6fdff',
   },
   link:{
-    color: '#18f3ff',
+    color: '#d6fdff',
     "&:visited":{
     },
     "&:hover":{

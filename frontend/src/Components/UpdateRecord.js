@@ -32,23 +32,36 @@ const useStyles = makeStyles((theme) => ({
 
 const UpdateRecord =({ props, setOpen })=>{
     const handleDateChange = (date) => {
-        setSelectedDate(date);
+        let newTime = new Date(date)
+        let parsed = newTime.getTime()
+        setSelectedDate(parsed);
+        setUnformattedSelectedDate(date);
+        setNewIngesDate(parsed)
+    }
+
+    const handleInvDateChange = (date) => {
+        let newTime = new Date(date)
+        let parsed = newTime.getTime()
+        setSelectedDate(parsed)
+        setUnformattedSelectedDate(date)
+        setNewLastInvDate(parsed)
     }
 
     const clickHandler=(e)=>{
         let requestOptions = {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: props.id,
                 name: newName,
                 serial: newSerial,
-                last_inges_date: newLastInvDate,
+                last_inv_date: newLastInvDate,
                 inges_date: newIngesDate,
                 active: newActive
             })
         }
-        fetch('http://localhost:3001/updaterecord', requestOptions)
+        fetch('https://class-wind-backend.herokuapp.com/updaterecord', requestOptions)
         setOpen(false)
     }
 
@@ -79,11 +92,11 @@ const UpdateRecord =({ props, setOpen })=>{
     const [ newIngesDate, setNewIngesDate ] = useState('')
     const [ newActive, setNewActive ] = useState('')
     const [ activeValue, setActiveValue ] = useState( props.value === 'false' ? false: true)
-    const [selectedDate, setSelectedDate] = useState(new Date('2014-08-18T21:11:54'));
+    const [selectedDate, setSelectedDate] = useState('');
+    const [unformattedSelectedDate, setUnformattedSelectedDate] = useState('')
     const classes = useStyles();
 
     let isChecked = activeValue
-    console.log('props.value', isChecked)
     let field = props.field
 
 
@@ -96,20 +109,34 @@ const UpdateRecord =({ props, setOpen })=>{
             <form onSubmit={handleSubmit}>
                 { field === 'name' ? <><InputLabel>Name:</InputLabel><TextField label="New Name" onChange={handleNameChange} onKeyPress={handleNameChange} /></> : <></> }
                 { field === 'serial' ? <><InputLabel>Serial:</InputLabel><TextField label="New Serial" onChange={handleSerialChange} /></> : <></> }
-                { field === 'last_inv_date' ? <><InputLabel>Inventory Date:</InputLabel><TextField label="New Inventory Date"/></> : <></> }
+                { field === 'last_inv_date' ? <><InputLabel>Inventory Date:</InputLabel><MuiPickersUtilsProvider utils={DateFnsUtils}><KeyboardDatePicker
+                    margin="normal"
+                    id="date-picker-dialog"
+                    format="MM/dd/yyyy"
+                    value={unformattedSelectedDate}
+                    onChange={handleInvDateChange}
+                />
+                <KeyboardTimePicker
+                    margin="normal"
+                    id="time-picker"
+                    value={unformattedSelectedDate}
+                    onChange={handleInvDateChange}
+                    KeyboardButtonProps={{
+                        'aria-label': 'change time',
+                    }}
+                />
+                </MuiPickersUtilsProvider></> : <></> }
                 { field === 'inges_date' ? <><InputLabel>Ingest Date:</InputLabel><MuiPickersUtilsProvider utils={DateFnsUtils}><KeyboardDatePicker
                     margin="normal"
                     id="date-picker-dialog"
-                    label="Date picker dialog"
                     format="MM/dd/yyyy"
-                    value={selectedDate}
+                    value={unformattedSelectedDate}
                     onChange={handleDateChange}
                 />
                 <KeyboardTimePicker
                     margin="normal"
                     id="time-picker"
-                    label="Time picker"
-                    value={selectedDate}
+                    value={unformattedSelectedDate}
                     onChange={handleDateChange}
                     KeyboardButtonProps={{
                         'aria-label': 'change time',

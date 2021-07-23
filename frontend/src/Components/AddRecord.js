@@ -65,6 +65,7 @@ const AddRecord=()=>{
         //event.preventDefault()
         let requestOptions = {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 name: name,
@@ -73,13 +74,13 @@ const AddRecord=()=>{
             })
         }
         setSerial('')
-        fetch('http://localhost:3001/addrecord', requestOptions)
+        fetch('https://class-wind-backend.herokuapp.com/addrecord', requestOptions)
 
     }
 
     useEffect(()=>{
         async function fetchBuildings(){
-            await fetch('http://localhost:3001/allbuildinglocations')
+            await fetch('https://class-wind-backend.herokuapp.com/allbuildinglocations')
             .then( res => res.json())
             .then( json=> setBuildings(json))
         }

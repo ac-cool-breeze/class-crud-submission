@@ -18,7 +18,7 @@ const NeedsInventory =()=>{
 
         let arrayToPush = []
 
-        fetch('http://localhost:3001/needsinventory')
+        fetch('https://class-wind-backend.herokuapp.com/needsinventory')
         .then( res => res.json())
         .then( data => {
             setColumns([

@@ -25,10 +25,11 @@ const ManageBuildings=()=>{
         e.preventDefault()
         let requestOptions = {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: buildingName })
         }
-        fetch('http://localhost:3001/addbuilding', requestOptions)
+        fetch('https://class-wind-backend.herokuapp.com/addbuilding', requestOptions)
     }
 
     const handleChange=(e)=>{

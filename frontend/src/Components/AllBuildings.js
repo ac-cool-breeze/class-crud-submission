@@ -6,7 +6,8 @@ const AllBuildings=({ SetBuildingLocation, buildingLocation  })=>{
     const [ buildings, setBuildings] = useState([])
 
     useEffect(()=>{
-        fetch('http://localhost:3001/allbuildinglocations')
+        fetch('https://class-wind-backend.herokuapp.com/allbuildinglocations')
+        .then( res => console.log(res))
         .then( res => res.json())
         .then( json=> setBuildings(json))
     },[])
